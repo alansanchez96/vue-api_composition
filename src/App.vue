@@ -1,95 +1,102 @@
 <script setup>
 
-const parrafoStyle = 'color:red';
-const arrayColor = ['azul', 'violet', 'orange'];
-const active = true;
-const frutas = ['banana', 'pera', 'manzana', 'anana'];
+import { computed, ref } from "vue";
 
-const arrObjFrutas = [
-  {
-    name: "Manzana",
-    price: "$1.00",
-    description: "Una manzana",
-    id: 1
-  },
-  {
-    name: "Pera",
-    price: "$2.00",
-    description: "Una pera",
-    id: 2
+const btnActive = message => console.log(message);
+
+const counter = ref(0); // Se le indica que es una variable reactiva
+const increment = () => counter.value++; // Se le debe agregar value
+
+/* Ejercicio 1*/
+const counterEjercicio = ref(0);
+const numbers = ref([1, 2, 3]);
+let activador = ref(false);
+
+const incrementarEjercicio = () => {
+  counterEjercicio.value++;
+  evaluarCounter();
+}
+const decrementarEjercicio = () => {
+  counterEjercicio.value--;
+  evaluarCounter();  
+}
+const resetEjercicio = () => {
+  counterEjercicio.value = 0;
+  evaluarCounter();
+}
+const classComputed = computed(() => {
+  if (counterEjercicio.value === 0) {
+    return 'neutral';
+  } else if (counterEjercicio.value > 0) {
+    return 'positivo';
+  } else {
+    return 'negativo';
   }
-];
+});
 
-const objFrutas = {
-  id: 1,
-  name: 'Banana',
-  price: '$1,00',
-  description: 'Una banana',
-  stock: 15
+const agregarNumero = counter => {
+  if (numbers.value.includes(counter)) {
+    activador.value = true;
+  } else {
+    numbers.value.push(counter);
+    activador.value = true;
+  }
+}
+
+const evaluarCounter = () => {
+  if (numbers.value.includes(counterEjercicio.value)) {
+    activador.value = true;
+  } else {
+    activador.value = false;
+  }
 }
 
 </script>
 
 <template>
 
-  <h3>V-BIND</h3>
-  <p :style="parrafoStyle">Soy un texto prueba de bind</p>
-  <p :style="`color: ${arrayColor[1]}`">Mis colores provienen de un array</p>
+  <h1>Reactividad</h1>
+
+  <h3>Eventos</h3>
+
+  <button @click.left="btnActive('diste click con izquierdo')">Activame con click izquierdo</button>
+  <button @click.middle="btnActive('diste click con scroll')">Activame con click scroll</button>
+  <button @click.right.prevent="btnActive('diste click con derecho')">Activame con click derecho</button>
 
   <hr>
 
-  <h3>DIRECTIVAS V-IF</h3>
+  <h3>Contador {{ counter }}</h3>
+  <!-- Se debe importar la libreria "ref" -->
 
-  <p v-if="active === true">Estoy activo</p>
-  <p v-else-if="active === false">Estoy inactivo</p>
-  <p v-else>Estoy indeciso</p> <!-- null -->
-  <!-- Tambien se pueden usar los operadores ternarios -->
-  <p>{{ active ? 'Está activo' : 'Esta inactivo' }}</p>
-
-  <h3>V-SHOW</h3>
-
-  <p v-show="active">Solo aparece y desaparece con un display:none. Para ver la accion, cambie el active por "false"</p>
-  <!-- 
-        En terminos generales "v-if" tiene costos  más altos que "v-show".
-        En v-show es mejor utilizarlo cuando quieres que un cambio se realice con mucha frecuencia
-        Y v-if cuando el cambio no sea tan necesario
-       -->
+  <button @click="increment">Activar contador</button>
 
   <hr>
 
-  <h3>V-FOR</h3>
+  <h3>Ejercicio</h3>
+
+  <p>Contador <span :class="classComputed"> {{ counterEjercicio }}</span></p>
+
+  <button @click="incrementarEjercicio">Incrementar</button>
+  <button @click="decrementarEjercicio">Decrementar</button>
+  <button @click="resetEjercicio">reset</button>
+  <button @click="agregarNumero(counterEjercicio)" :disabled="activador">Agregar</button> <br>
 
   <ul>
-    <li v-for="(fruta, index) in frutas">{{ index }} - {{ fruta }}</li>
+    <li v-for="number in numbers">{{ number }}</li>
   </ul>
 
-  <h3>V-FOR CON ARRAY DE OBJETOS</h3>
-
-  <ul>
-    <li v-for="(fruta, index) in arrObjFrutas" :key="fruta.id">
-      <p>{{ index }} - {{ fruta.name }}</p>
-      <p>Precio: {{ fruta.price }}</p>
-      <p>Descripcion: {{ fruta.description }}</p>
-    </li>
-  </ul>
-
-  <h3>V-FOR CON OBJETOS</h3>
-
-  <ul>
-    <li v-for="(value, property, index) in objFrutas">
-      {{ property }} : {{ value }}
-    </li>
-  </ul>
-
-  <h3>V-FOR CON V-IF</h3>
-  <!-- La manera correcta es la siguiente -->
-
-  <ul>
-    <template v-for="(fruta) in objFrutas">
-      <li v-if="fruta.stock > 0">{{ fruta.name }}</li>
-    </template>
-  </ul>
-
-
-  
 </template>
+
+<style>
+.positivo {
+  color: green;
+}
+
+.negativo {
+  color: red;
+}
+
+.neutral {
+  color: blue;
+}
+</style>
